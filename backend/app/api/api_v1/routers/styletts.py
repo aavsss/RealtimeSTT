@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Response, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, StreamingResponse
-from app.data_models.schemas import UserQuery
-from app.config import settings
+from data_models.schemas import UserQuery
+from config import settings
 import structlog
 import tempfile
 import io
@@ -14,7 +14,7 @@ from pydub import AudioSegment
 from fastapi.responses import StreamingResponse
 import base64
 
-from app.styleTTS2.run_tts import inference, LFinference
+# from styleTTS2.run_tts import inference, LFinference
 
 logger = structlog.get_logger()
 
@@ -75,8 +75,10 @@ def transcribe_audio_with_openai(audio_chunk: bytes, language="en") -> str:
             audio_file= open(temp_file_path, "rb")
             
             transcript = client.audio.transcriptions.create(
-            model="whisper-1", 
-            file=audio_file)
+                model="whisper-1", 
+                file=audio_file,
+                language="en"
+            )
             
             logger.info(f"transcript: {transcript.text}")
 
@@ -87,35 +89,35 @@ def transcribe_audio_with_openai(audio_chunk: bytes, language="en") -> str:
         return "Transcription error"
 
 
-@r.post("/tts")
-async def generate_tts(user_query: UserQuery):
-    diffusion_steps = 20
-    logger.info(f"query: {user_query}")
-    text = user_query.text
-    sentences = text.split('.') # simple split by comma
-    wavs = []
-    s_prev = None
-    for text in sentences:
-        if text.strip() == "": continue
-        text += '.' # add it back
-        noise = torch.randn(1,1,256).to(device)
-        wav, s_prev = LFinference(text, s_prev, noise, alpha=0.7, diffusion_steps=diffusion_steps, embedding_scale=1)
-        wavs.append(wav)
+# @r.post("/tts")
+# async def generate_tts(user_query: UserQuery):
+#     diffusion_steps = 20
+#     logger.info(f"query: {user_query}")
+#     text = user_query.text
+#     sentences = text.split('.') # simple split by comma
+#     wavs = []
+#     s_prev = None
+#     for text in sentences:
+#         if text.strip() == "": continue
+#         text += '.' # add it back
+#         noise = torch.randn(1,1,256).to(device)
+#         wav, s_prev = LFinference(text, s_prev, noise, alpha=0.7, diffusion_steps=diffusion_steps, embedding_scale=1)
+#         wavs.append(wav)
         
-    wav = np.concatenate(wavs)
+#     wav = np.concatenate(wavs)
     
-    # Save the generated audio to a temporary file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
-        torch_wav = torch.from_numpy(wav).reshape(1,-1)
-        torchaudio.save(temp_audio_file.name, torch_wav, 24000)
+#     # Save the generated audio to a temporary file
+#     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
+#         torch_wav = torch.from_numpy(wav).reshape(1,-1)
+#         torchaudio.save(temp_audio_file.name, torch_wav, 24000)
 
-        # Stream the temporary file chunk by chunk
-        def generate_audio_chunks():
-            with open(temp_audio_file.name, "rb") as audio_file:
-                while chunk := audio_file.read(1024 * 8):  # Read 8 KB chunks (adjust as needed)
-                    yield chunk
+#         # Stream the temporary file chunk by chunk
+#         def generate_audio_chunks():
+#             with open(temp_audio_file.name, "rb") as audio_file:
+#                 while chunk := audio_file.read(1024 * 8):  # Read 8 KB chunks (adjust as needed)
+#                     yield chunk
 
-        return StreamingResponse(generate_audio_chunks(), media_type="text/event-stream")
+#         return StreamingResponse(generate_audio_chunks(), media_type="text/event-stream")
 
     
 @r.post("/transcribe")

@@ -15,9 +15,9 @@ import os
 from nltk.tokenize import word_tokenize
 from styleTTS2.Utils.PLBERT.util import load_plbert
 
-from app.styleTTS2.models import *
-from app.styleTTS2.utils import *
-from app.styleTTS2.text_utils import TextCleaner
+from styleTTS2.models import *
+from styleTTS2.utils import *
+from styleTTS2.text_utils import TextCleaner
 
 logger = structlog.get_logger()
 
@@ -30,7 +30,7 @@ global_phonemizer = phonemizer.backend.EspeakBackend(language='en-us', preserve_
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Specify the path to the config file relative to the script directory
-config_path = os.path.join(script_dir, "Models/LJSpeech/config.yml")
+config_path = os.path.join(script_dir, "Configs/config.yml")
 
 config = yaml.safe_load(open(config_path))
 

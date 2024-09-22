@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from fastapi import Request
-from app.api.api_v1.routers.styletts import audio_router
+from api.api_v1.routers.styletts import audio_router
 import typing as t
 import uvicorn
 

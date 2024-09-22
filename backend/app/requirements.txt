@@ -7,5 +7,7 @@ uvicorn
 structlog
 insanely-fast-whisper
 faster-whisper
-
+openai
+pydub
+phonemizer
 
