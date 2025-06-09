@@ -77,7 +77,7 @@ def transcribe_audio_with_openai(audio_chunk: bytes, language="en") -> str:
             transcript = client.audio.transcriptions.create(
                 model="whisper-1", 
                 file=audio_file,
-                language="en"
+                language=language
             )
             
             logger.info(f"transcript: {transcript.text}")
