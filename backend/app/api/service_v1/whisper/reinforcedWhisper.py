@@ -14,7 +14,9 @@ class ReinforcedWhisper(Transcriber):
         self.logger = logger or structlog.get_logger()
         self.reinforcedPipeline = pipeline(
             "automatic-speech-recognition",
-            model="amitpant7/whisper-small-nepali",
+            model="amitpant7/Nepali-Automatic-Speech-Recognition",
+            token=settings.pyannote_diarization_api_key,
+            device=0 # 0 for GPU, 1 for CPU
         )
 
     def transcribe_audio(self, audio_chunk: bytes, language: str = "en") -> str:

@@ -51,7 +51,7 @@ async def get_audio_chunk(websocket: WebSocket):
             # Perform audio transcription using OpenAI API
             transcript = transcribe_audio(
                 audio_chunk=data,
-                modal=TranscriberOptions.REINFORCED_AI_WHISPER,
+                modal=TranscriberOptions.WAV2VEC2_NEPALI,
             )
 
             # Send the transcript back to the frontend

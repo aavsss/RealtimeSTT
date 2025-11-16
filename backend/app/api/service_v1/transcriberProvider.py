@@ -2,8 +2,13 @@ from app.api.service_v1.transcriberOptions import TranscriberOptions
 from app.api.service_v1.transcriber import Transcriber
 from app.api.service_v1.whisper.openAiWhisper import OpenAIWhisper
 from app.api.service_v1.whisper.reinforcedWhisper import ReinforcedWhisper
+from app.api.service_v1.wav2vec2.wav2vec2 import Wav2Vec2Transcriber
 
-def transcribe_audio(audio_chunk: bytes, modal: TranscriberOptions = TranscriberOptions.OPEN_AI_WHISPER, language: str = 'en') -> str:
+def transcribe_audio(
+        audio_chunk: bytes,
+        modal: TranscriberOptions = TranscriberOptions.WAV2VEC2_NEPALI,
+        language: str = 'en'
+) -> str:
     """
     Transcribe audio using the specified transcription model.
 
@@ -21,6 +26,9 @@ def transcribe_audio(audio_chunk: bytes, modal: TranscriberOptions = Transcriber
             return transcriber.transcribe_audio(audio_chunk, language=language)
         case TranscriberOptions.REINFORCED_AI_WHISPER:
             transcriber: Transcriber = ReinforcedWhisper()
+            return transcriber.transcribe_audio(audio_chunk, language=language)
+        case TranscriberOptions.WAV2VEC2_NEPALI:
+            transcriber: Transcriber = Wav2Vec2Transcriber()
             return transcriber.transcribe_audio(audio_chunk, language=language)
         case _:
             # Unsupported modal — preserve previous behavior (implicit None).

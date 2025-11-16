@@ -3,3 +3,4 @@ from enum import Enum
 class TranscriberOptions(str, Enum):
     OPEN_AI_WHISPER = "OPEN_AI_WHISPER"
     REINFORCED_AI_WHISPER = "REINFORCED_AI_WHISPER"
+    WAV2VEC2_NEPALI = "WAV2VEC2_NEPALI"
