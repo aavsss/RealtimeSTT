@@ -24,6 +24,11 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 client = OpenAI(api_key=settings.openai_api_key)
 
+diarization_pipeline = Pipeline.from_pretrained(
+    "pyannote/speaker-diarization", 
+    use_auth_token=settings.pyannote_diarization_api_key
+)
+
 
 @r.websocket("/listen")
 async def get_audio_chunk(websocket: WebSocket):
