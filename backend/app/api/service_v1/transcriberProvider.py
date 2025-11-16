@@ -1,6 +1,7 @@
 from app.api.service_v1.transcriberOptions import TranscriberOptions
 from app.api.service_v1.transcriber import Transcriber
 from app.api.service_v1.whisper.openAiWhisper import OpenAIWhisper
+from app.api.service_v1.whisper.reinforcedWhisper import ReinforcedWhisper
 
 def transcribe_audio(audio_chunk: bytes, modal: TranscriberOptions = TranscriberOptions.OPEN_AI_WHISPER, language: str = 'en') -> str:
     """
@@ -17,6 +18,9 @@ def transcribe_audio(audio_chunk: bytes, modal: TranscriberOptions = Transcriber
     match modal:
         case TranscriberOptions.OPEN_AI_WHISPER:
             transcriber: Transcriber = OpenAIWhisper.from_settings()
+            return transcriber.transcribe_audio(audio_chunk, language=language)
+        case TranscriberOptions.REINFORCED_AI_WHISPER:
+            transcriber: Transcriber = ReinforcedWhisper()
             return transcriber.transcribe_audio(audio_chunk, language=language)
         case _:
             # Unsupported modal — preserve previous behavior (implicit None).

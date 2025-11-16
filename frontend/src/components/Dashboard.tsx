@@ -11,12 +11,12 @@ export default function Dashboard() {
       <div className="App">
         <Flex vertical>
           <div style={{ margin: 'auto', textAlign: 'center' }}>
-            <Title style={{ fontSize: '2.25rem' }}> VoxSwift</Title>
+            <Title style={{ fontSize: '2.25rem' }}> Transcribe from Nepali to English</Title>
             <Paragraph
               style={{ margin: 'auto', fontSize: '20px', width: '50%' }}
             >
               Empower Your Voice, Transform Your Words: Lightning-Fast Speech to
-              Text (STT) and Text to Speech (TTS) for a Seamless Communication
+              Text (STT) for a Seamless Communication
               Experience!
             </Paragraph>
           </div>

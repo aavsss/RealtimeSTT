@@ -8,6 +8,8 @@ backend/**/__pycache__/
 .vscode
 backend/.env
 backend/.DS_Store
+backend/.idea
+backend/env
 .DS_Store
 .env.local
 .env

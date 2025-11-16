@@ -13,6 +13,8 @@ from openai import OpenAI
 from pydub import AudioSegment
 from fastapi.responses import StreamingResponse
 import base64
+
+from app.api.service_v1.transcriberOptions import TranscriberOptions
 from app.api.service_v1.transcriberProvider import transcribe_audio
 
 # from styleTTS2.run_tts import inference, LFinference
@@ -47,7 +49,10 @@ async def get_audio_chunk(websocket: WebSocket):
             data = await websocket.receive_bytes()
             
             # Perform audio transcription using OpenAI API
-            transcript = transcribe_audio(audio_chunk=data)
+            transcript = transcribe_audio(
+                audio_chunk=data,
+                modal=TranscriberOptions.REINFORCED_AI_WHISPER,
+            )
 
             # Send the transcript back to the frontend
             await websocket.send_text(transcript)

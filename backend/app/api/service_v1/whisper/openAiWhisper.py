@@ -4,6 +4,7 @@ from typing import Optional, Any
 from openai import OpenAI
 from app.api.service_v1.transcriber import Transcriber
 from config import settings
+from transformers import pipeline
 
 logger = structlog.get_logger()
 
