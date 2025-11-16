@@ -13,6 +13,7 @@ from openai import OpenAI
 from pydub import AudioSegment
 from fastapi.responses import StreamingResponse
 import base64
+from app.api.service_v1.transcriberProvider import transcribe_audio
 
 # from styleTTS2.run_tts import inference, LFinference
 
@@ -24,10 +25,10 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 client = OpenAI(api_key=settings.openai_api_key)
 
-diarization_pipeline = Pipeline.from_pretrained(
-    "pyannote/speaker-diarization", 
-    use_auth_token=settings.pyannote_diarization_api_key
-)
+# diarization_pipeline = Pipeline.from_pretrained(
+#     "pyannote/speaker-diarization",
+#     use_auth_token=settings.pyannote_diarization_api_key
+# )
 
 
 @r.websocket("/listen")
@@ -46,7 +47,7 @@ async def get_audio_chunk(websocket: WebSocket):
             data = await websocket.receive_bytes()
             
             # Perform audio transcription using OpenAI API
-            transcript = transcribe_audio_with_openai(data)
+            transcript = transcribe_audio(audio_chunk=data)
 
             # Send the transcript back to the frontend
             await websocket.send_text(transcript)
@@ -125,34 +126,34 @@ def transcribe_audio_with_openai(audio_chunk: bytes, language="en") -> str:
 #         return StreamingResponse(generate_audio_chunks(), media_type="text/event-stream")
 
     
-@r.post("/transcribe")
-async def transcribe_audio(file: dict):
-    """Transcribe the audio file using OpenAI Whisper models
+# @r.post("/transcribe")
+# async def transcribe_audio(file: dict):
+#     """Transcribe the audio file using OpenAI Whisper models
 
-    Args:
-        file (dict): Audio file as a base64-encoded string.
-    """
-    try:
-        # Create a directory to store audio files if not exists
-        os.makedirs("audio_files", exist_ok=True)
+#     Args:
+#         file (dict): Audio file as a base64-encoded string.
+#     """
+#     try:
+#         # Create a directory to store audio files if not exists
+#         os.makedirs("audio_files", exist_ok=True)
 
-        # Save the base64-encoded audio to a unique filename
-        audio_path = f"audio_files/test.wav"
+#         # Save the base64-encoded audio to a unique filename
+#         audio_path = f"audio_files/test.wav"
 
-        # Decode base64 and save to WAV file
-        base64_data = file.get("file", "")
-        audio_data = base64.b64decode(base64_data)
-        audio_segment = AudioSegment.from_file(io.BytesIO(audio_data))
-        audio_segment.export(audio_path, format="wav")
+#         # Decode base64 and save to WAV file
+#         base64_data = file.get("file", "")
+#         audio_data = base64.b64decode(base64_data)
+#         audio_segment = AudioSegment.from_file(io.BytesIO(audio_data))
+#         audio_segment.export(audio_path, format="wav")
 
-        # Transcribe the audio using OpenAI Whisper model
-        with open(audio_path, "rb") as audio_file:
-            transcript = client.audio.transcriptions.create(
-                model="whisper-1", file=audio_file
-            )
+#         # Transcribe the audio using OpenAI Whisper model
+#         with open(audio_path, "rb") as audio_file:
+#             transcript = client.audio.transcriptions.create(
+#                 model="whisper-1", file=audio_file
+#             )
 
-        return {"transcript": transcript.text}
+#         return {"transcript": transcript.text}
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
     
