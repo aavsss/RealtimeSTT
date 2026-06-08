@@ -6,7 +6,7 @@ from app.api.service_v1.wav2vec2.wav2vec2 import Wav2Vec2Transcriber
 
 def transcribe_audio(
         audio_chunk: bytes,
-        modal: TranscriberOptions = TranscriberOptions.WAV2VEC2_NEPALI,
+        modal: TranscriberOptions = TranscriberOptions.REINFORCED_AI_WHISPER,
         language: str = 'en'
 ) -> str:
     """

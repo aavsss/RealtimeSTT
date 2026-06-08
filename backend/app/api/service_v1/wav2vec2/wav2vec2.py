@@ -1,11 +1,10 @@
-import io
 import tempfile
 import torch
 import librosa
 import numpy as np
 import structlog
 from typing import Generator, List
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+from transformers import AutoModel, AutoModelForSeq2SeqLM, AutoTokenizer, Wav2Vec2ForCTC, Wav2Vec2Processor
 from app.api.service_v1.transcriber import Transcriber
 from pydub import AudioSegment
 import os
@@ -25,6 +24,13 @@ elif getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
 else:
     _device = torch.device("cpu")
 
+# translator_name = "santoshdahal/setu"
+# translatorTokenizer = AutoTokenizer.from_pretrained(translator_name, trust_remote_code=True)
+# translatorModel = AutoModelForSeq2SeqLM.from_pretrained(
+#     translator_name,
+#     trust_remote_code=True
+# ).to(_device)
+# translatorModel.eval()
 
 class Wav2Vec2Transcriber(Transcriber):
     """
@@ -106,6 +112,7 @@ class Wav2Vec2Transcriber(Transcriber):
                             # Decode the ids to text
                             transcription = self.processor.decode(predicted_ids[0])
                             return transcription
+                            # return self.translate_from_nepali_text_to_english(transcription)
                         except Exception as e:
                             print(f"Error during inference on file {chunk_file}: {e}")
 
@@ -205,3 +212,29 @@ class Wav2Vec2Transcriber(Transcriber):
             texts.append(text)
 
         return " ".join(texts)
+
+    def translate_from_nepali_text_to_english(self, text: str) -> str:
+        # These should be at top level
+        # translator_name = "santoshdahal/setu"
+        # translatorTokenizer = AutoTokenizer.from_pretrained(translator_name, trust_remote_code=True)
+        # translatorModel = AutoModelForSeq2SeqLM.from_pretrained(
+        #     translator_name,
+        #     trust_remote_code=True
+        # ).to(_device)
+        # translatorModel.eval()
+
+        # handle empty
+        if not text:
+            return ""
+
+        inputs = translatorTokenizer(text, return_tensors="pt", truncation=True, padding=True)
+        # move input tensors to device
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
+
+        # adjust generation arguments if needed (max_length, num_beams)
+        gen_kwargs = {"max_length": 512, "num_beams": 4, "early_stopping": True}
+
+        with torch.no_grad():
+            out = translatorModel.generate(**inputs, **gen_kwargs)
+
+        return translatorTokenizer.decode(out[0], skip_special_tokens=True)
